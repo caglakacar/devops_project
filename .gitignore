@@ -1,0 +1,13 @@
+postgresql/
+ 
+zabbix-server/
+ 
+zabbix-web/
+ 
+node-red/
+ 
+influxdbv2/
+
+grafana/
+
+.env

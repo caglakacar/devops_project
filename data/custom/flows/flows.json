@@ -1,0 +1,545 @@
+[
+    {
+        "id": "d9b64439289c5d73",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "053a694a39000393",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://influxdbv2:8086",
+        "timeout": "10",
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "e0e9aa3c21b3fb04",
+        "type": "http request",
+        "z": "d9b64439289c5d73",
+        "name": "telegraf",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://telegraf:5000/version",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 280,
+        "y": 580,
+        "wires": [
+            [
+                "03c94e6ecf2e48de"
+            ]
+        ]
+    },
+    {
+        "id": "03c94e6ecf2e48de",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "telegraf healthcheck",
+        "func": "var response = msg.payload;\n\ntry {\n    var jsonResponse = JSON.parse(response);\n    var versionString = jsonResponse[\"Telegraf Version\"];\n\n    // Regex to extract version number from \"Telegraf 1.31.2\"\n    var versionMatch = versionString.match(/(\\d+\\.\\d+\\.\\d+)/);\n    var version = versionMatch ? versionMatch[0] : \"unknown\";\n\n    msg.payload = {\n        \"name\": \"telegraf\",\n        \"version\": version\n    };\n    msg.topic = \"telegraf status\"; \n\n} catch (e) {\n    \n    msg.payload = {\n        \"name\": \"telegraf\",\n        \"version\": \"unknown\"\n    };\n    msg.payload = \"Our manager has been informed!\";\n    msg.topic = \"telegraf status\"; \n    msg.telegraf_status = \"error\";\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 580,
+        "wires": [
+            [
+                "2b70ee95fb15422a"
+            ]
+        ]
+    },
+    {
+        "id": "5c197496055f05e1",
+        "type": "http in",
+        "z": "d9b64439289c5d73",
+        "name": "status",
+        "url": "/status",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 420,
+        "wires": [
+            [
+                "f6d3df30a8420f0e",
+                "7163320f046bce34",
+                "9ee7047b134305c1",
+                "e0e9aa3c21b3fb04"
+            ]
+        ]
+    },
+    {
+        "id": "f6d3df30a8420f0e",
+        "type": "http request",
+        "z": "d9b64439289c5d73",
+        "name": "influxdb",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://influxdbv2:8086/health",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 280,
+        "y": 340,
+        "wires": [
+            [
+                "dbb301c00b611363"
+            ]
+        ]
+    },
+    {
+        "id": "f2824ae49b858f10",
+        "type": "http response",
+        "z": "d9b64439289c5d73",
+        "name": "loop",
+        "statusCode": "",
+        "headers": {},
+        "x": 1090,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "dbb301c00b611363",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "influxdb healthcheck",
+        "func": "var response;\ntry {\n    response = JSON.parse(msg.payload);\n    var result = {\n        name: response.name,\n        version: response.version\n    };\n    msg.payload = result;\n    msg.topic = \"influxdb status\";\n} catch (e) {\n    msg.payload = \"Our manager has been informed!\";\n    msg.topic = \"influxdb status\";\n    msg.influxdb_status = \"error\";\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 340,
+        "wires": [
+            [
+                "2b70ee95fb15422a"
+            ]
+        ]
+    },
+    {
+        "id": "7163320f046bce34",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "zabbix func",
+        "func": "msg.payload = {\n    \"jsonrpc\": \"2.0\",\n    \"method\": \"apiinfo.version\",\n    \"params\": [],\n    \"id\": 1\n};\nmsg.topic = \"zabbix healthcheck\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 420,
+        "wires": [
+            [
+                "c5accbfd06711f7f"
+            ]
+        ]
+    },
+    {
+        "id": "c5accbfd06711f7f",
+        "type": "http request",
+        "z": "d9b64439289c5d73",
+        "name": "zabbix",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://zabbix-web:8080/api_jsonrpc.php",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 450,
+        "y": 420,
+        "wires": [
+            [
+                "e7856b3c1cf0bb12"
+            ]
+        ]
+    },
+    {
+        "id": "e7856b3c1cf0bb12",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "zabbix healthcheck",
+        "func": "if (msg.payload && msg.payload.result) {\n    msg.payload = { name: \"zabbix\", version: msg.payload.result };\n    msg.topic = \"zabbix healthcheck\";\n} else {\n    msg.payload = \"Our manager has been informed!\";\n    msg.topic = \"zabbix healthcheck\";\n    msg.zabbix_status = \"error\";\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 420,
+        "wires": [
+            [
+                "2b70ee95fb15422a"
+            ]
+        ]
+    },
+    {
+        "id": "2b70ee95fb15422a",
+        "type": "join",
+        "z": "d9b64439289c5d73",
+        "name": "join",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "useparts": false,
+        "accumulate": false,
+        "timeout": "",
+        "count": "4",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 910,
+        "y": 420,
+        "wires": [
+            [
+                "f2824ae49b858f10",
+                "a5b1f6b9748bac46"
+            ]
+        ]
+    },
+    {
+        "id": "a5b1f6b9748bac46",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "checker",
+        "func": "var influxdbStatus = msg.influxdb_status || \"ok\";\nvar zabbixStatus = msg.zabbix_status || \"ok\";\nvar grafanaStatus = msg.grafana_status || \"ok\";\nvar telegrafStatus = msg.telegraf_status || \"ok\";\n\nif (influxdbStatus === \"error\" || zabbixStatus === \"error\" || grafanaStatus == \"error\" || telegrafStatus == \"error\") {\n    msg.payload = \"Our manager has been informed!\";\n    return [msg, { payload: \"A service is not working! Please check their services!\"}];\n}\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 460,
+        "wires": [
+            [],
+            [
+                "89d9c52faaf08c8c"
+            ]
+        ]
+    },
+    {
+        "id": "89d9c52faaf08c8c",
+        "type": "e-mail",
+        "z": "d9b64439289c5d73",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "authtype": "BASIC",
+        "saslformat": true,
+        "token": "oauth2Response.access_token",
+        "secure": true,
+        "tls": false,
+        "name": "ckacar.servicepark@gmail.com",
+        "dname": "sending e-mail",
+        "x": 1280,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "9ee7047b134305c1",
+        "type": "http request",
+        "z": "d9b64439289c5d73",
+        "name": "grafana",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://grafana:3000/api/health",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 280,
+        "y": 500,
+        "wires": [
+            [
+                "4925e4c3575a4720"
+            ]
+        ]
+    },
+    {
+        "id": "4925e4c3575a4720",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "grafana healthcheck",
+        "func": "var result;\nvar grafanaStatus = \"ok\";\n\ntry {\n    const { version } = msg.payload || {};\n    if (!version) {\n        throw new Error(\"Grafana version information is missing.\");\n    }\n\n    result = { name: \"grafana\", version: version };\n    msg.status = \"success\";\n    msg.topic = \"grafana status\"; \n} catch (e) {\n    msg.payload = \"Our manager has been informed!\";\n    msg.topic = \"grafana status\";\n    msg.grafana_status = \"error\";\n    return msg; \n}\n\nmsg.payload = result; \nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 500,
+        "wires": [
+            [
+                "2b70ee95fb15422a"
+            ]
+        ]
+    },
+    {
+        "id": "b03b7ffe42dee2a0",
+        "type": "http request",
+        "z": "d9b64439289c5d73",
+        "name": "flask",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://telegraf:5000/config",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 370,
+        "y": 700,
+        "wires": [
+            [
+                "5429c3a5476aa371"
+            ]
+        ]
+    },
+    {
+        "id": "4dbbce2cd0f4c119",
+        "type": "http in",
+        "z": "d9b64439289c5d73",
+        "name": "config",
+        "url": "/config",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 230,
+        "y": 700,
+        "wires": [
+            [
+                "b03b7ffe42dee2a0"
+            ]
+        ]
+    },
+    {
+        "id": "5429c3a5476aa371",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "toml",
+        "func": "msg.payload = msg.payload;\nmsg.headers = { 'Content-Type': 'text/plain' };\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 700,
+        "wires": [
+            [
+                "f86cfe1fc6132249"
+            ]
+        ]
+    },
+    {
+        "id": "f86cfe1fc6132249",
+        "type": "http response",
+        "z": "d9b64439289c5d73",
+        "name": "loop",
+        "statusCode": "",
+        "headers": {},
+        "x": 650,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "6b71400e61041d88",
+        "type": "influxdb in",
+        "z": "d9b64439289c5d73",
+        "influxdb": "053a694a39000393",
+        "name": "influxdb query",
+        "query": "from(bucket: \"default\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ping\")\n  |> filter(fn: (r) => r[\"_field\"] == \"average_response_ms\")\n  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |> yield(name: \"mean\")\n",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "basicattempt",
+        "x": 380,
+        "y": 60,
+        "wires": [
+            [
+                "bfeb1ca1d3e2dfb8"
+            ]
+        ]
+    },
+    {
+        "id": "bfeb1ca1d3e2dfb8",
+        "type": "function",
+        "z": "d9b64439289c5d73",
+        "name": "avg / url values",
+        "func": "let payload = msg.payload;\n\nlet filteredPayload = payload.map(item => {\n    return {\n        average_ms: item._value,\n        url: item.url\n\n    };\n});\n\nmsg.payload = JSON.stringify(filteredPayload);\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 60,
+        "wires": [
+            [
+                "38cf42bc3af1fa7a"
+            ]
+        ]
+    },
+    {
+        "id": "38cf42bc3af1fa7a",
+        "type": "http response",
+        "z": "d9b64439289c5d73",
+        "name": "loop",
+        "statusCode": "",
+        "headers": {},
+        "x": 750,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "5214a82b8b653a18",
+        "type": "http in",
+        "z": "d9b64439289c5d73",
+        "name": "ping",
+        "url": "/ping",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 60,
+        "wires": [
+            [
+                "6b71400e61041d88"
+            ]
+        ]
+    },
+    {
+        "id": "b87cc96a5f7805c6",
+        "type": "inject",
+        "z": "d9b64439289c5d73",
+        "name": "e-mail content",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "subject text",
+        "payload": "This is a test mail",
+        "payloadType": "str",
+        "x": 250,
+        "y": 160,
+        "wires": [
+            [
+                "2646602eb3063920"
+            ]
+        ]
+    },
+    {
+        "id": "2646602eb3063920",
+        "type": "e-mail",
+        "z": "d9b64439289c5d73",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "authtype": "BASIC",
+        "saslformat": true,
+        "token": "oauth2Response.access_token",
+        "secure": true,
+        "tls": false,
+        "name": "ckacar.servicepark@gmail.com",
+        "dname": "sending e-mail",
+        "x": 440,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "f84caa347f320204",
+        "type": "comment",
+        "z": "d9b64439289c5d73",
+        "name": "ping",
+        "info": "",
+        "x": 90,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "bc7bc26fb777226e",
+        "type": "comment",
+        "z": "d9b64439289c5d73",
+        "name": "e-mail",
+        "info": "",
+        "x": 90,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "4125a7f72a315f88",
+        "type": "comment",
+        "z": "d9b64439289c5d73",
+        "name": "config",
+        "info": "",
+        "x": 90,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "489edd841640c9aa",
+        "type": "comment",
+        "z": "d9b64439289c5d73",
+        "name": "influxdb, zabbix, grafana and telegraf healthcheck",
+        "info": "",
+        "x": 220,
+        "y": 280,
+        "wires": []
+    }
+]
