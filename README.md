@@ -486,6 +486,11 @@ This document explains the available API endpoints for managing Telegraf through
   - Error: Returns a JSON object with an error message and a 500 status code.
 Example usage: **http://localhost:5000/config**
 
+<br />
+<div align="center">
+    <img src="images/get ping.png">
+</div>
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br>
 
@@ -501,6 +506,11 @@ This endpoint updates the Telegraf configuration and restarts the service.
   - Error: Returns a JSON object with an error message and a 500 status code.
 Example usage: **http://localhost:5000/config**
 
+<br />
+<div align="center">
+    <img src="images/put ping.png">
+</div>
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br>
 
@@ -513,6 +523,11 @@ This endpoint restarts the Telegraf service.
   - Success: Returns a success message with a 200 status code if Telegraf is restarted successfully.
   - Error: Returns an error message with a 500 status code if the restart fails.
 Example usage: **http://localhost:5000/restart**
+
+<br />
+<div align="center">
+    <img src="images/get restart.png">
+</div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br>
