@@ -73,15 +73,15 @@
 
 
 ### About The Project
-This project sets up a comprehensive monitoring and data management system using **Docker**. It integrates:
+This project sets up a comprehensive monitoring and data management system using **`Docker`**. It integrates:
 
-- **InfluxDB:** For time-series data storage
-- **Grafana:** For data visualization
-- **Node-RED:** For flow-based programming and API endpoints
-- **Telegraf:** For metrics collection and reporting
-- **Zabbix:** For enterprise-class monitoring
-- **Flask:** API for managing Telegraf configurations
-- **Postman:** For testing Flask API endpoints
+- **`InfluxDB:`** For time-series data storage
+- **`Grafana:`** For data visualization
+- **`Node-RED:`** For flow-based programming and API endpoints
+- **`Telegraf:`** For metrics collection and reporting
+- **`Zabbix:`** For enterprise-class monitoring
+- **`Flask:`** API for managing Telegraf configurations
+- **`Postman:`** For testing Flask API endpoints
   
 The system collects, stores, visualizes, and monitors various metrics and logs, offering a complete solution for system and application monitoring.
 
@@ -286,19 +286,19 @@ Postman is a powerful tool for API development, testing, and automation. It allo
 
 
 ##### Importing the Postman Collection
-1. **Locate the Collection:**
+- **`1-) Locate the Collection:`**
    - The Postman collection file is located at **`./data/custom/postman/telegraf_api_collection.json`**.
 
-2. **Importing the Collection:**
+- **`2-) Importing the Collection:`**
    - Open Postman.
    - Click on **`Import`** in the top-left corner.
    - Select "Upload Files" and navigate to **`telegraf_api_collection.json`**` to find the collection file.
    - Click "Open" to import the collection.
 
-3. **Using the Collection:**
+- **`3-) Using the Collection:`**
    - Once imported, the collection will appear in your **`Postman sidebar`**.
    - Expand the collection to see all the available endpoints.
-   - Click on any endpoint to view its details and send a request.
+   - Click on any endpoint to view its details and **`send a request`**.
 
 Notes:
 - Ensure that the Flask service running the **`Telegraf API is active and accessible`**.
