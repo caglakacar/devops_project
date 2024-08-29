@@ -488,9 +488,9 @@ Example usage: **http://localhost:5000/config**
 
 <br />
 <div align="center">
-    <img src="images/get ping.png">
+    <img src="images/get config.png">
 </div>
-
+<br>
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br>
 
@@ -508,9 +508,9 @@ Example usage: **http://localhost:5000/config**
 
 <br />
 <div align="center">
-    <img src="images/put ping.png">
+    <img src="images/put config.png">
 </div>
-
+<br>
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br>
 
@@ -528,9 +528,8 @@ Example usage: **http://localhost:5000/restart**
 <div align="center">
     <img src="images/get restart.png">
 </div>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- Built With -->
